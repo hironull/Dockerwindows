@@ -4,51 +4,62 @@
 ![KVM](https://img.shields.io/badge/KVM-FF6600?style=for-the-badge&logo=linux&logoColor=white)
 ![Windows](https://img.shields.io/badge/Windows-10-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 
-A Docker container solution for running Windows 10 with KVM acceleration, providing remote access via VNC and RDP.
+A lightweight Docker container image that runs Windows 10 inside a KVM-accelerated virtual machine and exposes remote access via noVNC (web) and RDP. Designed for local testing, demos, and sandboxed environments.
 
-## 🚀 Getting Started
+Important: This project requires a valid Windows 10 ISO and a licensed copy of Windows. This repository does not provide Windows images or ISOs.
 
-### Prerequisites
-- Docker installed
-- KVM enabled system
-- Administrative privileges
+## Features
 
-## 📦 Features
+- Run Windows 10 inside a container with KVM acceleration
+- Remote access via:
+  - noVNC in the browser (HTTP)
+  - RDP (3389/TCP)
+- Persistent storage using Docker volumes
+- Minimal host changes — uses /dev/kvm and Docker only
 
-- ⚡ Run Windows 10 inside a Docker container
-- 🔒 Secure with isolated environment
-- 🖥️ Access via noVNC (web browser) or RDP
-- 🚀 Fast virtualization using KVM (requires host support)
-- 💾 Persistent storage using Docker volumes
+## Requirements
 
----
+- Linux host with KVM support (verify /dev/kvm exists)
+- Docker engine installed
+- Root or Docker privileges to access /dev/kvm and create containers
+- Windows 10 ISO (ISO file on host)
+- Sufficient CPU, RAM, and disk (recommend >= 4 vCPUs, 8 GB RAM, and 60 GB disk)
 
-## 🛠️ Requirements
+## Quick start
 
-- **Linux host** with:
-  - KVM enabled (`/dev/kvm` should exist)
-  - Docker installed
-- **Windows 10 ISO** (for initial installation)
-- Modern web browser (for noVNC access)
-
----
-
-## 🚀 Installation
-
-### 1. Clone the Repository
+1. Clone this repository
 ```bash
-git clone https://github.com/hopingboyz/windows10vm
+git clone https://github.com/hironull/Dockerwindows.git
+cd Dockerwindows
+```
 
-cd windows10vm
+## Stopping, starting & cleanup
 
+- Stop:
+```bash
+docker stop windows10
+```
+- Start:
+```bash
+docker start windows10
+```
+- Remove container (data persists in the `windows_data` volume):
+```bash
+docker rm -f windows10
+```
+- Remove data volume (permanently deletes VM storage):
+```bash
+docker volume rm windows_data
+```
 
-docker build -t windows10-vm .
+## Customization
 
+- Persist additional host folders by mounting volumes.
+- Modify the image or container entrypoint to change QEMU options (RAM, CPU, disk format, GPU passthrough if available).
 
-docker run -it --rm \
-  --device /dev/kvm \
-  -p 6080:6080 \
-  -p 3389:3389 \
-  -v windows_data:/data \
-  -v windows_iso:/iso \
-  windows10-vm
+## Limitations
+
+- KVM acceleration requires host support — this will not run with full performance on non-linux hosts.
+- GPU passthrough, nested virtualization, and other advanced features may require extra host configuration.
+
+Made by Hironull
